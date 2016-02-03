@@ -1,0 +1,10 @@
+---
+- name: Install and remove packages
+  hosts: hotspots
+
+  tasks:
+    - name: install tcpdump package
+      opkg: name=tcpdump state=present
+
+    - name: remove tcpdump package
+      opkg: name=tcpdump state=absent

@@ -1,0 +1,42 @@
+#!/usr/bin/lua
+
+local json = require("json")
+
+local args_file = arg[1]
+local fd = io.open(args_file, "r")
+local params = fd:read("*a")
+fd:close()
+
+local name = string.match(params, "name=(%w+)") or nil
+local state = string.match(params, "state=(%w+)") or "present"
+
+local action
+if state == "present" then
+    action = "install"
+elseif state == "absent" then
+    action = "remove"
+end
+
+local cmd1 = "/bin/opkg update 1>/dev/null 2>&1"
+local cmd1 = "/bin/opkg "..action.." "..name.." 1>/dev/null 2>&1"
+local cmds = {cmd1, cmd2}
+
+local rc
+for _, cmd in pairs(cmds) do
+    rc = os.execute(cmd)
+    if rc ~= 0 then
+        break
+    end
+end
+
+local changed
+if rc == 0 then
+    changed = true
+else
+    changed = false
+end
+
+local plain_out = {changed = false, name = name, state = state}
+local json_enc_output = json.encode(plain_out)
+
+io.write(json_enc_output)
