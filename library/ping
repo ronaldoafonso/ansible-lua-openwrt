@@ -1,0 +1,8 @@
+#!/usr/bin/lua
+
+local json = require("json")
+
+local plain_out = {changed = false, ping = "pong"}
+local json_enc_output = json.encode(plain_out)
+
+io.write(json_enc_output)

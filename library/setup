@@ -1,0 +1,49 @@
+#!/usr/bin/lua
+
+local json = require("json")
+
+
+function get_architecture()
+    local fd_cmd = io.popen("/bin/uname -m 2>/dev/null", "r")
+    local architecture = string.match(fd_cmd:read("*a"), "(%w+)") or " "
+    fd_cmd:close()
+    return architecture
+end
+
+function get_distribution_version_and_codename()
+    local fd = io.open("/etc/openwrt_release", "r")
+    local lines = fd:read("*a")
+    fd:close()
+    local distribution = string.match(lines, "DISTRIB_ID='(%w-)'") or " "
+    local version = string.match(lines, "DISTRIB_RELEASE='(%d+%.%d+)") or " "
+    local codename = string.match(lines, "DISTRIB_CODENAME='(%a-)'") or " "
+    return distribution, version, codename
+end
+
+function get_hardware_manufacturer_and_product()
+    local fd = io.open("/etc/device_info", "r")
+    local lines = fd:read("*a")
+    fd:close()
+    local manufacturer = string.match(lines, "DEVICE_MANUFACTURER='(%w+%-%w+)'") or " "
+    local product = string.match(lines, "DEVICE_PRODUCT='(%w+%-%w+)'") or " "
+    return manufacturer, product
+end
+
+
+local ansible_architecture = get_architecture()
+local ansible_distribution,
+      ansible_distribution_version,
+      ansible_distribution_codename = get_distribution_version_and_codename()
+local ansible_hardware_manufacturer,
+      ansible_hardware_product = get_hardware_manufacturer_and_product()
+
+local plain_out = {ansible_facts = {ansible_architecture = ansible_architecture,
+                                    ansible_distribution = ansible_distribution,
+                                    ansible_distribution_version = ansible_distribution_version,
+                                    ansible_distribution_codename = ansible_distribution_codename,
+                                    ansible_hardware_manufacturer = ansible_hardware_manufacturer,
+                                    ansible_hardware_product = ansible_hardware_product},
+                   changed = false}
+local json_enc_output = json.encode(plain_out)
+
+io.write(json_enc_output)

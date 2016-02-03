@@ -1,0 +1,7 @@
+---
+- name: Ping all hotspots
+  hosts: hotspots
+
+  tasks:
+    - name: ping host
+      ping:
