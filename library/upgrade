@@ -1,0 +1,29 @@
+#!/usr/bin/lua
+
+local json = require("json")
+local posix = require("posix")
+
+local changed = true
+local pid = posix.fork()
+if pid == -1 then
+    changed = false
+elseif pid == 0 then
+    if not posix.setpid("s") then
+        changed = false
+    else
+        posix.umask(0022)
+        posix.chdir("/tmp")
+        local devnull = io.open("/dev/null", "w")
+        posix.dup2(posix.fileno(devnull), posix.fileno(io.stdin))
+        posix.dup2(posix.fileno(devnull), posix.fileno(io.stdout))
+        posix.dup2(posix.fileno(devnull), posix.fileno(io.stderr))
+        devnull:close()
+        local cmd = '/sbin/sysupgrade -n /tmp/openwrt-1.0-ar71xx-generic-tl-wdr4300-v1-squashfs-sysupgrade.bin 1>/tmp/upg.log 2>&1 &'
+        local rc = os.execute(cmd)
+    end
+end
+
+local plain_out = {changed = changed}
+local json_enc_output = json.encode(plain_out)
+
+io.write(json_enc_output)
