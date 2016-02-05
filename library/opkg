@@ -17,26 +17,33 @@ elseif state == "absent" then
     action = "remove"
 end
 
-local cmd1 = "/bin/opkg update 1>/dev/null 2>&1"
-local cmd1 = "/bin/opkg "..action.." "..name.." 1>/dev/null 2>&1"
-local cmds = {cmd1, cmd2}
+local installed = false
+local rc = os.execute("/bin/opkg list-installed | grep '"..name.."' 1>/dev/null 2>&1")
+if rc == 0 then
+    installed = true
+end
 
-local rc
-for _, cmd in pairs(cmds) do
-    rc = os.execute(cmd)
-    if rc ~= 0 then
-        break
+local changed = true
+if action == "install" and installed then
+    changed = false
+elseif action == "remove" and not installed then
+    changed = false
+else
+    local cmd1 = "/bin/opkg update 1>/dev/null 2>&1"
+    local cmd2 = "/bin/opkg "..action.." "..name.." 1>/dev/null 2>&1"
+    local cmds = {cmd1, cmd2}
+    local rc
+    for _, cmd in pairs(cmds) do
+        rc = os.execute(cmd)
+        if rc ~= 0 then
+            changed = false
+            break
+        end
     end
 end
 
-local changed
-if rc == 0 then
-    changed = true
-else
-    changed = false
-end
 
-local plain_out = {changed = false, name = name, state = state}
+local plain_out = {changed = changed, name = name, state = state}
 local json_enc_output = json.encode(plain_out)
 
 io.write(json_enc_output)
