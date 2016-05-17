@@ -1,0 +1,31 @@
+#!/usr/bin/lua
+
+local json = require("json")
+
+local args_file = arg[1]
+local fd = io.open(args_file, "r")
+local params = fd:read("*a")
+fd:close()
+
+local command = string.match(params, "([%w%s%p]+)") or nil
+
+function exec(command)
+    local cmd = command.." 1>/tmp/.anscmd 2>&1"
+    local rc = os.execute(cmd)
+    local fd = io.open("/tmp/.anscmd", "r")
+    local buffer = fd:read("*a")
+    fd:close()
+    return rc, buffer
+end
+
+local ok, rc, output = pcall(exec, command)
+if not ok then
+    failed = true
+else
+    failed = false
+end
+
+local plain_out = {failed = failed, rc = rc, msg = output}
+local json_out = json.encode(plain_out)
+
+io.write(json_out)
