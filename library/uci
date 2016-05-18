@@ -1,0 +1,48 @@
+#!/usr/bin/lua
+
+local json = require("json")
+
+local args_file = arg[1]
+local fd = io.open(args_file, "r")
+local params = fd:read("*a")
+fd:close()
+
+local command = string.match(params, "command=(%w+)") or nil
+local config = string.match(params, "config=(%w+)") or nil
+local session = string.match(params, "session=(%w+)") or nil
+local option = string.match(params, "option=(%w+)") or nil
+local value = string.match(params, "value=(%w+)") or nil
+
+function exec(cmd)
+    local cmd = cmd.." 1>/dev/null 2>&1"
+    local rc = os.execute(cmd)
+    return rc
+end
+
+local cmd = "uci "
+local changed = false
+
+if command then cmd = cmd.." "..command end
+if config  then cmd = cmd.." "..config  end
+if session then
+    if command == "add" then
+        cmd = cmd.." "..session
+    else
+        cmd = cmd.."."..session
+    end
+end
+if option then cmd = cmd.."."..option end
+if value  then cmd = cmd.."="..value end
+
+local ok, rc = pcall(exec, cmd)
+if not ok then
+    failed = true
+else
+    failed = false
+    changed = true
+end
+
+local plain_out = {changed = changed, failed = failed}
+local json_out = json.encode(plain_out)
+
+io.write(json_out)

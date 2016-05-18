@@ -1,0 +1,16 @@
+---
+- name: Create VPN interface
+  hosts: hotspots
+
+  tasks:
+    - name: add vpn interface
+      uci: command=set config=network session=vpn value=interface
+
+    - name: add vpn interface name
+      uci: command=set config=network session=vpn option=ifname value=tun0
+
+    - name: add vpn protocol
+      uci: command=set config=network session=vpn option=proto value=none
+
+    - name: commit vpn
+      uci: command=commit config=network
