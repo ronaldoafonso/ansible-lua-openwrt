@@ -1,0 +1,25 @@
+---
+- name: Create Wi-Fi ssid
+  hosts: hotspots
+
+  tasks:
+    - name: add wifi iface
+      uci: command=add config=wireless session=wifi-iface
+
+    - name: set wifi iface device
+      uci: command=set config=wireless session=@wifi-iface[-1] option=device value=radio0
+
+    - name: set wifi iface network
+      uci: command=set config=wireless session=@wifi-iface[-1] option=network value=lan10
+
+    - name: set wifi iface mode
+      uci: command=set config=wireless session=@wifi-iface[-1] option=mode value=ap
+
+    - name: set wifi iface ssid
+      uci: command=set config=wireless session=@wifi-iface[-1] option=ssid value=ssid
+
+    - name: set wifi iface encryption
+      uci: command=set config=wireless session=@wifi-iface[-1] option=encryption value=none
+
+    - name: commit wireless
+      uci: command=commit config=wireless
