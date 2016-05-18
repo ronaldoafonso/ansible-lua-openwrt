@@ -1,0 +1,19 @@
+---
+- name: Create network VLAN
+  hosts: hotspots
+
+  tasks:
+    - name: add switch_vlan
+      uci: command=add config=network session=switch_vlan
+
+    - name: add switch_vlan device
+      uci: command=set config=network session=@switch_vlan[-1] option=device value=switch0
+
+    - name: add switch_vlan vlan
+      uci: command=set config=network session=@switch_vlan[-1] option=vlan value=10
+
+    - name: add switch_vlan ports
+      uci: command=set config=network session=@switch_vlan[-1] option=ports value="0t 2t 3t 4t 5t"
+
+    - name: commit network
+      uci: command=commit config=network
