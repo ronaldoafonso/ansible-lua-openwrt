@@ -1,0 +1,28 @@
+---
+- name: Create DHCP address pool
+  hosts: hotspots
+
+  tasks:
+    - name: add dhcp address pool
+      uci: command=set config=dhcp session=lan10 value=dhcp
+
+    - name: add dhcp listen interface
+      uci: command=set config=dhcp session=lan10 option=interface value=lan10
+
+    - name: add dhcp start address
+      uci: command=set config=dhcp session=lan10 option=start value=100
+
+    - name: add dhcp limit address
+      uci: command=set config=dhcp session=lan10 option=limit value=150
+
+    - name: add dhcp leasetime
+      uci: command=set config=dhcp session=lan10 option=leasetime value=30m
+
+    - name: add dhcp dhcpv6
+      uci: command=set config=dhcp session=lan10 option=dhcpv6 value=server
+
+    - name: add dhcp ra
+      uci: command=set config=dhcp session=lan10 option=ra value=server
+
+    - name: commit dhcp
+      uci: command=commit config=dhcp
