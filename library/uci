@@ -43,7 +43,9 @@ if not ok then
     failed = true
 else
     failed = false
-    changed = true
+    if command == "commit" then
+        changed = true
+    end
 end
 
 local plain_out = {changed = changed, failed = failed}
