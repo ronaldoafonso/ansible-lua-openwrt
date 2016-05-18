@@ -1,17 +1,21 @@
 #!/usr/bin/lua
+-- WANT_JSON
 
 local json = require("json")
 
 local args_file = arg[1]
 local fd = io.open(args_file, "r")
-local params = fd:read("*a")
+local args = json.decode(fd:read("*a"))
 fd:close()
 
-local command = string.match(params, "command=(%w+)") or nil
-local config = string.match(params, "config=(%w+)") or nil
-local session = string.match(params, "session=(%w+)") or nil
-local option = string.match(params, "option=(%w+)") or nil
-local value = string.match(params, "value=(%w+)") or nil
+local command = args["command"]
+local config = args["config"]
+local session = args["session"]
+local option = args["option"]
+local value
+if args["value"] then
+    value = "'"..args["value"].."'"
+end
 
 function exec(cmd)
     local cmd = cmd.." 1>/dev/null 2>&1"
