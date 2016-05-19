@@ -10,7 +10,7 @@
       uci: command=set config=wireless session=@wifi-iface[-1] option=device value=radio0
 
     - name: set wifi iface network
-      uci: command=set config=wireless session=@wifi-iface[-1] option=network value=lan10
+      uci: command=set config=wireless session=@wifi-iface[-1] option=network value=lan1
 
     - name: set wifi iface mode
       uci: command=set config=wireless session=@wifi-iface[-1] option=mode value=ap
