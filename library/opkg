@@ -1,14 +1,15 @@
 #!/usr/bin/lua
+-- WANT_JSON
 
 local json = require("json")
 
 local args_file = arg[1]
 local fd = io.open(args_file, "r")
-local params = fd:read("*a")
+local args = json.decode(fd:read("*a"))
 fd:close()
 
-local name = string.match(params, "name=(%w+)") or nil
-local state = string.match(params, "state=(%w+)") or "present"
+local name = args["name"]
+local state = args["state"] or "present"
 
 local action
 if state == "present" then
@@ -18,19 +19,22 @@ elseif state == "absent" then
 end
 
 local installed = false
-local rc = os.execute("/bin/opkg list-installed | grep '"..name.."' 1>/dev/null 2>&1")
+local rc = os.execute("opkg list-installed | grep -q -w '"..name.."' 1>/dev/null 2>&1")
 if rc == 0 then
     installed = true
 end
 
+local failed = true
 local changed = true
 if action == "install" and installed then
     changed = false
+    failed = false
 elseif action == "remove" and not installed then
     changed = false
+    failed = false
 else
-    local cmd1 = "/bin/opkg update 1>/dev/null 2>&1"
-    local cmd2 = "/bin/opkg "..action.." "..name.." 1>/dev/null 2>&1"
+    local cmd1 = "opkg update 1>/dev/null 2>&1"
+    local cmd2 = "opkg "..action.." "..name.." 1>/dev/null 2>&1"
     local cmds = {cmd1, cmd2}
     local rc
     for _, cmd in pairs(cmds) do
@@ -40,10 +44,11 @@ else
             break
         end
     end
+    if rc == 0 then failed = false end
 end
 
 
-local plain_out = {changed = changed, name = name, state = state}
-local json_enc_output = json.encode(plain_out)
+local plain_out = {changed = changed, failed = failed}
+local json_out = json.encode(plain_out)
 
-io.write(json_enc_output)
+io.write(json_out)
