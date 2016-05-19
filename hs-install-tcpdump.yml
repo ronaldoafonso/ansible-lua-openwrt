@@ -1,0 +1,12 @@
+---
+- name: Check if hotspot is reachable and if so install tcpdump
+  hosts: hotspots
+
+  tasks:
+    - name: check if hotspot is reachable
+      ping:
+      register: reachable
+
+    - name: install tcpdump
+      opkg: name=tcpdump state=present
+      when: reachable is defined
