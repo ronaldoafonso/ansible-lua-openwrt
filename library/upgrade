@@ -1,7 +1,15 @@
 #!/usr/bin/lua
+-- WANT_JSON
 
 local json = require("json")
 local posix = require("posix")
+
+local args_file = arg[1]
+local fd = io.open(args_file, "r")
+local args = json.decode(fd:read("*a"))
+fd:close()
+
+local firmware = args["firmware"] or nil
 
 local changed = true
 local pid = posix.fork()
@@ -18,7 +26,7 @@ elseif pid == 0 then
         posix.dup2(posix.fileno(devnull), posix.fileno(io.stdout))
         posix.dup2(posix.fileno(devnull), posix.fileno(io.stderr))
         devnull:close()
-        local cmd = '/sbin/sysupgrade -n /tmp/openwrt-1.0-ar71xx-generic-tl-wdr4300-v1-squashfs-sysupgrade.bin 1>/tmp/upg.log 2>&1 &'
+        local cmd = "/sbin/sysupgrade -n "..firmware.." 1>/tmp/upg.log 2>&1 &"
         local rc = os.execute(cmd)
     end
 end

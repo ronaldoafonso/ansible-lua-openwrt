@@ -1,13 +1,14 @@
 #!/usr/bin/lua
+-- WANT_JSON
 
 local json = require("json")
 
 local args_file = arg[1]
 local fd = io.open(args_file, "r")
-local params = fd:read("*a")
+local args = json.decode(fd:read("*a"))
 fd:close()
 
-local command = string.match(params, "([%w%s%p]+)") or nil
+local command = args["command"] or nil
 
 function exec(command)
     local cmd = command.." 1>/tmp/.anscmd 2>&1"
@@ -18,11 +19,10 @@ function exec(command)
     return rc, buffer
 end
 
+local failed = false
 local ok, rc, output = pcall(exec, command)
-if not ok then
+if not ok or rc ~= 0 then
     failed = true
-else
-    failed = false
 end
 
 local plain_out = {failed = failed, rc = rc, msg = output}

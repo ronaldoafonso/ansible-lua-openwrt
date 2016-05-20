@@ -44,6 +44,6 @@ local plain_out = {ansible_facts = {ansible_architecture = ansible_architecture,
                                     ansible_hardware_manufacturer = ansible_hardware_manufacturer,
                                     ansible_hardware_product = ansible_hardware_product},
                    changed = false}
-local json_enc_output = json.encode(plain_out)
+local json_out = json.encode(plain_out)
 
-io.write(json_enc_output)
+io.write(json_out)
