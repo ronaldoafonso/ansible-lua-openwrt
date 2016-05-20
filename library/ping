@@ -2,7 +2,7 @@
 
 local json = require("json")
 
-local plain_out = {changed = false, ping = "pong"}
-local json_enc_output = json.encode(plain_out)
+local plain_out = {changed = false, failed = false, ping = "pong"}
+local json_out = json.encode(plain_out)
 
-io.write(json_enc_output)
+io.write(json_out)
