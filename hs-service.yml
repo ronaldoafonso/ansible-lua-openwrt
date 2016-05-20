@@ -1,0 +1,22 @@
+---
+- name: Change service states
+  hosts: hotspots
+
+  tasks:
+    - name: start dnsmasq
+      service: name=dnsmasq state=start
+
+    - name: stop dnsmasq
+      service: name=dnsmasq state=stop
+
+    - name: restart dnsmasq
+      service: name=dnsmasq state=restart
+
+    - name: reload dnsmasq
+      service: name=dnsmasq state=reload
+
+    - name: disable dnsmasq
+      service: name=dnsmasq state=disable
+
+    - name: enable dnsmasq
+      service: name=dnsmasq state=enable

@@ -1,0 +1,35 @@
+#!/usr/bin/lua
+-- WANT_JSON
+
+local json = require("json")
+
+local args_file = arg[1]
+local fd = io.open(args_file, "r")
+local args = json.decode(fd:read("*a"))
+fd:close()
+
+local name = args["name"] or nil
+local state = args["state"] or "start"
+
+function exec(cmd)
+    local cmd = cmd.." 1>/dev/null 2>&1"
+    local rc = os.execute(cmd)
+    return rc
+end
+
+if name then
+    name = "/etc/init.d/"..name.." "..state
+end
+
+local changed = true
+local failed = false
+local ok, rc = pcall(exec, name)
+if not ok then
+    failed = true
+    changed = false
+end
+
+local plain_out = {changed = changed, failed = failed}
+local json_out = json.encode(plain_out)
+
+io.write(json_out)
