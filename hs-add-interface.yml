@@ -1,28 +1,33 @@
 ---
 - name: Create network interface
   hosts: hotspots
+  vars:
+    lan: lan1
+    ifname: eth0.10
+    ipaddr: 192.168.122.1
+    netmask: 255.255.254.0
 
   tasks:
     - name: add lan interface
-      uci: command=set config=network session=lan1 value=interface
+      uci: command=set config=network session={{ lan }} value=interface
 
     - name: add lan interface force_link
-      uci: command=set config=network session=lan1 option=force_link value=1
+      uci: command=set config=network session={{ lan }} option=force_link value=1
 
     - name: add lan interface ifname
-      uci: command=set config=network session=lan1 option=ifname value=eth0.10
+      uci: command=set config=network session={{ lan }} option=ifname value={{ ifname }}
 
     - name: add lan interface type
-      uci: command=set config=network session=lan1 option=type value=bridge
+      uci: command=set config=network session={{ lan }} option=type value=bridge
 
     - name: add lan interface proto
-      uci: command=set config=network session=lan1 option=proto value=static
+      uci: command=set config=network session={{ lan }} option=proto value=static
 
     - name: add lan interface ip address
-      uci: command=set config=network session=lan1 option=ipaddr value=192.168.122.1
+      uci: command=set config=network session={{ lan }} option=ipaddr value={{ ipaddr }}
 
     - name: add lan interface netmask ip address
-      uci: command=set config=network session=lan1 option=netmask value=255.255.254.0
+      uci: command=set config=network session={{ lan }} option=netmask value={{ netmask }}
 
     - name: commit network
       uci: command=commit config=network
