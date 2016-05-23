@@ -4,14 +4,14 @@
 
   tasks:
     - name: install openwrt packages
-      opkg: name={{ item }} state=present
+      opkg: name={{item}} state=present
       with_items:
         - tcpdump
         - tc
         - strace
 
     - name: remove openwrt packages
-      opkg: name={{ item }} state=absent
+      opkg: name={{item}} state=absent
       with_items:
         - tcpdump
         - tc

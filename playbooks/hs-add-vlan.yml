@@ -15,11 +15,11 @@
       notify: commit network
 
     - name: add switch_vlan vlan
-      uci: command=set config=network session=@switch_vlan[-1] option=vlan value={{ vlan }}
+      uci: command=set config=network session=@switch_vlan[-1] option=vlan value={{vlan}}
       notify: commit network
 
     - name: add switch_vlan ports
-      uci: command=set config=network session=@switch_vlan[-1] option=ports value="{{ ports }}"
+      uci: command=set config=network session=@switch_vlan[-1] option=ports value="{{ports}}"
       notify: commit network
 
   handlers:
