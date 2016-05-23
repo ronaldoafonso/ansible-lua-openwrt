@@ -1,11 +1,8 @@
 ---
 - name: Create Wi-Fi ssid
   hosts: hotspots
-  vars:
-    device: radio0
-    lan: lan1
-    ssid: ssid
-    encryption: none
+  vars_files:
+    - hotspot_vars.yml
 
   tasks:
     - name: add wifi iface

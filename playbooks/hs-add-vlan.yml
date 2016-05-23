@@ -1,9 +1,8 @@
 ---
 - name: Create network VLAN
   hosts: hotspots
-  vars:
-    vlan: 10
-    ports: 0t 2t 3t 4t 5t
+  vars_files:
+    - hotspot_vars.yml
 
   tasks:
     - name: add switch_vlan

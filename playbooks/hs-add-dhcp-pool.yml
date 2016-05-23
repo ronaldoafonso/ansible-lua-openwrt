@@ -1,9 +1,8 @@
 ---
 - name: Create DHCP address pool
   hosts: hotspots
-  vars:
-    lan: lan1
-    leasetime: 30m
+  vars_files:
+    - hotspot_vars.yml
 
   tasks:
     - name: add dhcp address pool

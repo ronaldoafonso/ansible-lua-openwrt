@@ -1,11 +1,8 @@
 ---
 - name: Create network interface
   hosts: hotspots
-  vars:
-    lan: lan1
-    ifname: eth0.10
-    ipaddr: 192.168.122.1
-    netmask: 255.255.254.0
+  vars_files:
+    - hotspot_vars.yml
 
   tasks:
     - name: add lan interface
