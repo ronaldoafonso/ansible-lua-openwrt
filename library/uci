@@ -43,7 +43,12 @@ if not ok then
     failed = true
 else
     failed = false
-    changed = true
+    if command == "commit"   or command == "add"      or
+       command == "add_list" or command == "del_list" or
+       command == "set"      or command == "delete"   or
+       command == "rename" then
+        changed = true
+    end
 end
 
 local plain_out = {changed = changed, failed = failed}
