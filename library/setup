@@ -1,7 +1,10 @@
 #!/usr/bin/lua
 
 local json = require("json")
+local uci = require("uci")
 
+
+local ucursor = uci.cursor()
 
 function get_architecture()
     local fd_cmd = io.popen("/bin/uname -m 2>/dev/null", "r")
@@ -29,6 +32,42 @@ function get_hardware_manufacturer_and_product()
     return manufacturer, product
 end
 
+function get_config_network_vlan()
+    local config_network_vlans = {}
+    function get_network_vlan(vlan_table)
+        table.insert(config_network_vlans, {switch_vlan = vlan_table[".name"],
+                                            vlan = vlan_table["vlan"],
+                                            ports = vlan_table["ports"]})
+    end
+    ucursor:foreach("network", "switch_vlan", get_network_vlan)
+    return config_network_vlans
+end
+
+function get_config_network_lan(lan)
+    local config_network_lan = {}
+    if ucursor:get("network", lan) then
+        config_network_lan["ifname"] = ucursor:get("network", lan, "ifname")
+        config_network_lan["type"] = ucursor:get("network", lan, "type")
+        config_network_lan["proto"] = ucursor:get("network", lan, "proto")
+        config_network_lan["ipaddr"] = ucursor:get("network", lan, "ipaddr")
+        config_network_lan["netmask"] = ucursor:get("network", lan, "netmask")
+    else
+        config_network_lan = nil
+    end
+    return config_network_lan
+end
+
+function get_config_dhcp_lan(lan)
+    local config_dhcp_lan = {}
+    if ucursor:get("dhcp", lan) then
+        config_dhcp_lan["start"] = ucursor:get("dhcp", lan, "start")
+        config_dhcp_lan["limit"] = ucursor:get("dhcp", lan, "limit")
+        config_dhcp_lan["leasetime"] = ucursor:get("dhcp", lan, "leasetime")
+    else
+        config_dhcp_lan = nil
+    end
+    return config_dhcp_lan
+end
 
 local ansible_architecture = get_architecture()
 local ansible_distribution,
@@ -37,13 +76,41 @@ local ansible_distribution,
 local ansible_hardware_manufacturer,
       ansible_hardware_product = get_hardware_manufacturer_and_product()
 
+local ansible_config_network_vlan = get_config_network_vlan()
+
+local ansible_config_network_lan  = get_config_network_lan("lan")
+local ansible_config_network_lan1 = get_config_network_lan("lan1")
+local ansible_config_network_lan2 = get_config_network_lan("lan2")
+local ansible_config_network_lan3 = get_config_network_lan("lan3")
+local ansible_config_network_lan4 = get_config_network_lan("lan4")
+
+local ansible_config_dhcp_lan  = get_config_dhcp_lan("lan")
+local ansible_config_dhcp_lan1 = get_config_dhcp_lan("lan1")
+local ansible_config_dhcp_lan2 = get_config_dhcp_lan("lan2")
+local ansible_config_dhcp_lan3 = get_config_dhcp_lan("lan3")
+local ansible_config_dhcp_lan4 = get_config_dhcp_lan("lan4")
+
 local plain_out = {ansible_facts = {ansible_architecture = ansible_architecture,
                                     ansible_distribution = ansible_distribution,
                                     ansible_distribution_version = ansible_distribution_version,
                                     ansible_distribution_codename = ansible_distribution_codename,
                                     ansible_hardware_manufacturer = ansible_hardware_manufacturer,
-                                    ansible_hardware_product = ansible_hardware_product},
+                                    ansible_hardware_product = ansible_hardware_product,
+                                    ansible_config_network_vlan = ansible_config_network_vlan},
                    changed = false}
+
+if ansible_config_network_lan  then plain_out.ansible_facts["ansible_config_network_lan"]  = ansible_config_network_lan  end
+if ansible_config_network_lan1 then plain_out.ansible_facts["ansible_config_network_lan1"] = ansible_config_network_lan1 end
+if ansible_config_network_lan2 then plain_out.ansible_facts["ansible_config_network_lan2"] = ansible_config_network_lan2 end
+if ansible_config_network_lan3 then plain_out.ansible_facts["ansible_config_network_lan3"] = ansible_config_network_lan3 end
+if ansible_config_network_lan4 then plain_out.ansible_facts["ansible_config_network_lan4"] = ansible_config_network_lan4 end
+
+if ansible_config_dhcp_lan  then plain_out.ansible_facts["ansible_config_dhcp_lan"]  = ansible_config_dhcp_lan  end
+if ansible_config_dhcp_lan1 then plain_out.ansible_facts["ansible_config_dhcp_lan1"] = ansible_config_dhcp_lan1 end
+if ansible_config_dhcp_lan2 then plain_out.ansible_facts["ansible_config_dhcp_lan2"] = ansible_config_dhcp_lan2 end
+if ansible_config_dhcp_lan3 then plain_out.ansible_facts["ansible_config_dhcp_lan3"] = ansible_config_dhcp_lan3 end
+if ansible_config_dhcp_lan4 then plain_out.ansible_facts["ansible_config_dhcp_lan4"] = ansible_config_dhcp_lan4 end
+
 local json_out = json.encode(plain_out)
 
 io.write(json_out)
