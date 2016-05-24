@@ -1,0 +1,4 @@
+---
+  - include: hs-wireless-handler.yml
+  - include: hs-network-handler.yml
+  - include: hs-dhcp-handler.yml

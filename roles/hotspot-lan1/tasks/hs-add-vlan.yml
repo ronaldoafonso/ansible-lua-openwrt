@@ -1,0 +1,15 @@
+- name: add switch_vlan
+  uci: command=add config=network session=switch_vlan
+  notify: commit network
+
+- name: add switch_vlan device
+  uci: command=set config=network session=@switch_vlan[-1] option=device value=switch0
+  notify: commit network
+
+- name: add switch_vlan vlan
+  uci: command=set config=network session=@switch_vlan[-1] option=vlan value={{vlan}}
+  notify: commit network
+
+- name: add switch_vlan ports
+  uci: command=set config=network session=@switch_vlan[-1] option=ports value="{{ports}}"
+  notify: commit network

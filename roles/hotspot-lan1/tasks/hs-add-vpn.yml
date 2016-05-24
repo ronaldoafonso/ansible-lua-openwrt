@@ -1,0 +1,11 @@
+- name: add vpn interface
+  uci: command=set config=network session=vpn value=interface
+  notify: commit vpn
+
+- name: add vpn interface name
+  uci: command=set config=network session=vpn option=ifname value={{ifname}}
+  notify: commit vpn
+
+- name: add vpn protocol
+  uci: command=set config=network session=vpn option=proto value={{proto}}
+  notify: commit vpn

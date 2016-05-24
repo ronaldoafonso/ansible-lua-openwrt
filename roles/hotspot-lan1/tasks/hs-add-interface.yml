@@ -1,0 +1,27 @@
+- name: add lan interface
+  uci: command=set config=network session={{lan}} value=interface
+  notify: commit network
+
+- name: add lan interface force_link
+  uci: command=set config=network session={{lan}} option=force_link value=1
+  notify: commit network
+
+- name: add lan interface ifname
+  uci: command=set config=network session={{lan}} option=ifname value={{ifname}}
+  notify: commit network
+
+- name: add lan interface type
+  uci: command=set config=network session={{lan}} option=type value=bridge
+  notify: commit network
+
+- name: add lan interface proto
+  uci: command=set config=network session={{lan}} option=proto value=static
+  notify: commit network
+
+- name: add lan interface ip address
+  uci: command=set config=network session={{lan}} option=ipaddr value={{ipaddr}}
+  notify: commit network
+
+- name: add lan interface netmask ip address
+  uci: command=set config=network session={{lan}} option=netmask value={{netmask}}
+  notify: commit network

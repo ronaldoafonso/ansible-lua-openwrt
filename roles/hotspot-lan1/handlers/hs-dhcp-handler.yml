@@ -1,0 +1,6 @@
+- name: commit dhcp
+  uci: command=commit config=dhcp
+  notify: restart dhcp
+
+- name: restart dhcp
+  service: name=dnsmasq state=restart

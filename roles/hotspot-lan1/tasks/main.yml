@@ -1,0 +1,5 @@
+---
+  - include: hs-add-vlan.yml
+  - include: hs-add-interface.yml
+  - include: hs-add-ssid.yml
+  - include: hs-add-dhcp-pool.yml

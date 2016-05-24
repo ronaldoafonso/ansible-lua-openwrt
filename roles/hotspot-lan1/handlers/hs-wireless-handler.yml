@@ -1,0 +1,3 @@
+- name: commit wireless
+  uci: command=commit config=wireless
+  notify: restart network

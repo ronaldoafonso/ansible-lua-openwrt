@@ -1,0 +1,6 @@
+- name: commit network
+  uci: command=commit config=network
+  notify: restart network
+
+- name: restart network
+  service: name=network state=restart

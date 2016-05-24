@@ -1,0 +1,6 @@
+---
+- name: Hotspot with lan1
+  hosts: hotspots
+
+  roles:
+    - role: hotspot-lan1
